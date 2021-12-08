@@ -25,10 +25,11 @@ object MainZIO extends zio.App  {
     7 -> "Greg"
   )
   case class MyError(msg: String)
-  /** Get all people's name based on the primary keys to check. The keys are contained
-   * in DB1. Also some people might be missing from DB2 ? */
-  def queryDB2(key: List[Int]): Task[List[Either[MyError, String]]] = {
-    Task.effect(key.map(k => db2.get(k).toRight(MyError(s"Cannot find person with key $k"))))
+  /** Get all people's name based on the primary keys. The keys are contained
+   * in DB1. Also some people might be missing from DB2 so we handle that with an Either.
+   * We return a Vector just for the example. */
+  def queryDB2(key: List[Int]): Task[Vector[Either[MyError, String]]] = {
+    Task.effect(key.map(k => db2.get(k).toRight(MyError(s"Cannot find person with key $k"))).toVector)
   }
 
   def run(args: List[String]) = {
@@ -37,7 +38,7 @@ object MainZIO extends zio.App  {
       db1FilteredResult <- db1Result.filterErrorM((lErr: List[Throwable]) => putStrLn(s"Failure parsing rows in DB1 : $lErr"))
 
       db2Result <- queryDB2(db1FilteredResult)
-      db2FilteredResult <- db2Result.filterErrorM((lErr: List[MyError]) => putStrLn(s"Failure reading name in DB2: $lErr"))
+      db2FilteredResult <- db2Result.filterErrorM((lErr: Vector[MyError]) => putStrLn(s"Failure reading name in DB2: $lErr"))
 
       _ <- putStrLn(s"Final clean result: $db2FilteredResult")
     } yield ()

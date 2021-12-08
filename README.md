@@ -28,8 +28,8 @@ Checkout the examples package for toy-examples (with side-effects and pure with 
 
 ## Most common combinations of collections and errors:
 You can use the filterError methods on many different containers. 
-- Collections: List, Vector, Option
-- Errors: Option, Try, Either
+- Collections: `List`, `Vector`, `Option`, `Queue`
+- Errors: `Option`, `Try`, `Either`
 
 
 

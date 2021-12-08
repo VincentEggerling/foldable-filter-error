@@ -21,18 +21,19 @@ object MainScala {
     7 -> "Greg"
   )
   case class MyError(msg: String)
-  /** Get all people's name based on the primary keys to check. The keys are contained
-   * in DB1. Also some people might be missing from DB2 ? */
-  def queryDB2(key: List[Int]): List[Either[MyError, String]] = {
-    key.map(k => db2.get(k).toRight(MyError(s"Cannot find person with key $k")))
+  /** Get all people's name based on the primary keys. The keys are contained
+   * in DB1. Also some people might be missing from DB2 so we handle that with an Either.
+   * We return a Vector just for the example. */
+  def queryDB2(key: List[Int]): Vector[Either[MyError, String]] = {
+    key.map(k => db2.get(k).toRight(MyError(s"Cannot find person with key $k"))).toVector
   }
 
   def main(args: Array[String]): Unit = {
     val db1Result: List[Try[Int]] = queryDB1
     val db1FilteredResult: List[Int] = db1Result.filterError((lErr: List[Throwable]) => println(s"Failure parsing rows in DB1 : $lErr"))
 
-    val db2Result: List[Either[MyError, String]]  = queryDB2(db1FilteredResult)
-    val db2FilteredResult: List[String] = db2Result.filterError((lErr: List[MyError]) => println(s"Failure reading name in DB2: $lErr"))
+    val db2Result: Vector[Either[MyError, String]]  = queryDB2(db1FilteredResult)
+    val db2FilteredResult: Vector[String] = db2Result.filterError((lErr: Vector[MyError]) => println(s"Failure reading name in DB2: $lErr"))
 
     println("Final clean result: " + db2FilteredResult)
   }
