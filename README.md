@@ -18,8 +18,8 @@ has its downside:
   not always.
 
 This brings us back to our `filterError` and in particular it's two variants (Here we assume a `List[Try[X]]`)
-- `filterError(List[Throwable] => Unit)`
-- `filterErrorM[M[_]: Monad](List[Throwable] => M[Unit])`
+- `filterError(errHandler: List[Throwable] => Unit)`
+- `filterErrorM[M[_]: Monad](errHandler: List[Throwable] => M[Unit])`
 
 they allows the caller to flatten the errors **and** provide a way to process the errors either in a side-effecty way, or purely with a monadic 
 representation of the side-effect (Using cats IO, or ZIO, etc...)
